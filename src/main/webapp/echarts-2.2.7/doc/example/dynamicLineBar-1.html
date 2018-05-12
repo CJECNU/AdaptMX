@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<style type="text/css">
+*{
+	margin:0;
+	padding:0;
+}
+
+</style>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>bar-1</title>
+
+    <link rel="shortcut icon" href="../asset/ico/favicon.png">
+
+    <link href="../asset/css/bootstrap.css" rel="stylesheet">
+    <link href="../asset/css/carousel.css" rel="stylesheet">
+    <link href="../asset/css/echartsHome-1.css" rel="stylesheet">
+   
+    <script src="./www/js/echarts.js"></script>
+    <script src="../asset/js/codemirror.js"></script>
+    <script src="../asset/js/javascript.js"></script>
+
+</head>
+
+<body>
+            <div id="sidebar-code" class="col-md-4" hidden>
+                <div class="well sidebar-nav">
+                    <textarea id="code" name="code">
+option = {
+    title: {
+		text: 'Stream Volume变化图',
+		subtext: 'f = |R|/|S|',
+		x: 'center'
+			},
+    tooltip : {
+        trigger: 'axis'
+    },
+    dataZoom : {
+        show : false,
+        start : 0,
+        end : 100
+    },
+    xAxis : [
+        {
+            type : 'category',
+            boundaryGap : true,
+            axisLine:{
+                        lineStyle:{
+                            color:'#1d1689'
+                        }
+                    }, 
+                    axisLabel: {
+                        textStyle: {
+                            color: '#00000',
+                            fontSize:'10'
+                        },
+                    },          
+            data : (function (){
+                var now = new Date();
+                var res = [];
+                var len = 8;
+                while (len--) {
+                    res.unshift(now.toLocaleTimeString().replace(/^\D*/,''));
+                    now = new Date(now - 2000);
+                }
+                return res;
+            })()
+        },
+        {
+            type : 'category',
+            boundaryGap : true,
+            show: false,
+            data : (function (){
+                var res = [];
+                var len = 8;
+                while (len--) {
+                    res.push(len + 1);
+                }
+                return res;
+            })()
+        }
+    ],
+    yAxis : [
+        {
+            type : 'value',
+            scale: true,
+            name : 'amount',
+            axisLine:{
+                        lineStyle:{
+                            color:'#1d1689',
+//                            width:8,//这里是为了突出显示加上的，可以去掉
+                        }
+                    }, 
+            boundaryGap: [0.2, 0.2]
+        },
+        
+        {
+            type : 'value',
+            scale: true,
+            boundaryGap: [0.2, 0.2]
+        }
+    ],
+    series : [
+        {
+            name:'A',
+            type:'bar',
+            xAxisIndex: 1,
+            yAxisIndex: 1,
+            data:(function (){
+                var res = [];
+                var len = 8;
+                while (len--) {
+                    res.push(Math.round(Math.random() * 500 +30));
+                }
+                return res;
+            })()
+        },
+        {
+            name:'B',
+            type:'line',
+            data:(function (){
+                var res = [];
+                var len = 8;
+                while (len--) {
+                    res.push(Math.round(Math.random() * 500 +30));
+                }
+                return res;
+            })()
+        }
+    ]
+};
+var lastData = 11;
+var axisData;
+clearInterval(timeTicket);
+timeTicket = setInterval(function (){
+    lastData += Math.random() * ((Math.round(Math.random() * 10) % 2) == 0 ? 1 : -1);
+    lastData = lastData.toFixed(1) - 0;
+    axisData = (new Date()).toLocaleTimeString().replace(/^\D*/,'');
+    
+    // 动态数据接口 addData
+    myChart.addData([
+        [
+            0,        // 系列索引
+            Math.round(Math.random() * 500+30), // 新增数据
+            true,     // 新增数据是否从队列头部插入
+            false     // 是否增加队列长度，false则自定删除原有数据，队头插入删队尾，队尾插入删队头
+        ],
+        [
+            1,        // 系列索引
+            lastData, // 新增数据
+            false,    // 新增数据是否从队列头部插入
+            false,    // 是否增加队列长度，false则自定删除原有数据，队头插入删队尾，队尾插入删队头
+            axisData  // 坐标轴标签
+        ]
+    ]);
+}, 2100);
+                    </textarea>
+              </div>
+            </div>
+            <div id="graphic">
+                <div id="main" class="main"></div>
+                <div hidden>
+                    <select id="theme-select"></select>
+                </div>
+            </div>
+
+  
+    <script src="../asset/js/jquery.min.js"></script>
+    <script type="text/javascript" src="../asset/js/echartsHome.js"></script>
+    <script src="../asset/js/bootstrap.min.js"></script>
+    <script type="text/javascript">var timeTicket;</script>
+    <script src="../asset/js/echartsExample.js"></script>
+</body>
+</html>

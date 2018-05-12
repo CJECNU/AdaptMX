@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>demo1</title>
+<!-- 引入 echarts.js -->
+<script src="echarts.js"></script>
+<link rel="stylesheet" href="style-2.css">
+<link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<!--<script type="text/javascript" src="canvas-1.js"></script> --><!--<link rel="stylesheet" href="bootstrap-3.3.7.min.css">  
+	<script src="jquery-2.1.1.min.js"></script>
+	<script src="bootstrap-3.3.7.min.js"></script>-->
+</head>
+<body>
+
+<div id="topic">分布式流数据处理系统中可扩展join方法研究及实现</div>
+<div class="bod">
+<div id="require" style="height: 150px; float: left; width: 500px; padding-left:20px;">
+  <form role="form">
+    <div class="row">
+      <div class="col-lg-10">
+        <label for="name">
+        <h2>
+        执行的查询语句:
+        <h2>
+        </label>
+        <div class="input-group">
+          <input type="text" class="form-control" placeholder="Select * from lineitem as li, order as or where li.item_id=or.item_id">
+          <span class="input-group-btn">
+            <button id="rq-btn" class="btn btn-default" type="button">执行 </button>
+          </span></div>
+      </div>
+    </div>
+  </form>
+</div>
+<div class="radio" id="module">
+  <h2>处理模式：</h2>
+  <label>
+    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1">
+    历史模式 </label>
+  <br>
+  <label>
+    <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2" checked>
+    全窗口记录模式 </label>
+</div>
+<div id="dataamount">
+  <h2>数据集：</h2>
+  <form role="form">
+  <div style="margin:4px 7px 4px 0px;width:40px;float:left; color:#333; font-size:18px;">规模
+  </div>
+    <div class="input-group"  style="width:145px; float:left; ">
+      <input type="text" class="form-control" placeholder="16">
+      <span class="input-group-addon">GB</span> </div>
+    <div style="margin:12px 7px 4px 0px;width:40px;float:left; color:#333; font-size:18px;">skew
+  </div>
+    <div class="input-group"  style="width:145px; float:left; margin-top: 7px; ">
+      <input type="text" class="form-control" placeholder="2.0">
+      <span class="input-group-addon">.00</span> </div>
+  </form>
+</div>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+<!--（一）数据分布-->
+<div class="charttitle1">
+  <div class="title">(1) Stream Information</div>
+  <div id="main11" style="width: 598px;height:400px; float: left; margin: 20px 5px 10px 0px; padding: 0px;"></div>
+  <!--<div id="main12" style="width: 598px;height:400px; float: left; margin: 20px 0px 5px 5px; padding: 0px;"></div>-->
+  <iframe scrolling="no" frameborder="0" width="598px;" height="400px" style="margin: 20px 0px 5px 5px; padding: 0px;border:1px solid black;" src="echarts-2.2.7/doc/example/dynamicLineBar-1 - 修改1.html"></iframe>
+
+</div>
+<br>
+<br>
+<br>
+<!--(二）Task Load-->
+<div class="charttitle2">
+  <div class="title">(2) Task Load Statistics</div>
+ <!-- <div id="main22" style="width: 555px;height:285px;float: left;margin-left:35px; margin-top: 20px;"></div>
+  <div id="main23" style="width: 555px;height:285px;float: left;margin-left:25px; margin-top: 20px;"></div>-->
+   <iframe scrolling="no" frameborder="0" width="1220px;" height="340px" src="echar8.html"></iframe>
+</div>
+<br>
+<br>
+<br>
+<div class="charttitle3">
+  <div class="title">(3) Matrix Transformation</div>
+  <iframe scrolling="no" frameborder="0" width="1260px;" height="640px" src=" "></iframe>
+  <iframe scrolling="no" frameborder="0" width="1260px;" height="740px" src="echar5.html"></iframe>
+</div>
+<br>
+<br>
+<br>
+<div class="charttitle4">
+  <div class="title">(4) Tuple-based and Key-based Routing</div>
+  <iframe scrolling="no" frameborder="0" width="1260px;" height="740px" src="echar6.html"></iframe>
+</div>
+<script type="text/javascript">
+				var rqbtn = document.getElementById('rq-btn');
+				rqbtn.onclick = function () {
+					window.location.reload();
+				}
+
+				 // 基于准备好的dom，初始化echarts实例
+				var myChart = echarts.init(document.getElementById('main11'));
+
+				option = {
+					title: {
+						text: 'Skewed Distribution',
+						subtext: 'zip = 2.0',
+						x: 'center',
+						 textStyle: {
+				        	 fontWeight:'bolder',
+				        	 fontSize: 25,
+				         },
+				         subtextStyle:{
+					            fontSize:18,
+					            fontWeight:'bold', 
+					      },
+					},
+					 textStyle: {
+			        	 fontWeight:'bold',
+			        	 fontSize: 13,
+			         },
+					tooltip: {
+						trigger: 'axis'
+					},
+    legend: {
+        data:['z=2.0']
+    },
+					toolbox: {
+						show: true,
+						feature: {
+							mark: {
+								show: true
+							},
+							dataView: {
+								show: true,
+								readOnly: false
+							},
+							restore: {
+								show: true
+							}
+						}
+					},
+					
+					calculable: true,
+					xAxis: [{
+						name: 'keys',
+				        nameTextStyle: { 
+				        	fontWeight:'bold',
+				            fontSize:'16',
+				    	},
+						type: 'category',
+						axisLabel: {
+							 textStyle: {
+						    	 fontWeight:'bold',
+					             fontSize:16,		        
+					   		 },
+						},
+						boundaryGap: false,
+						//data: ['0', '1250', '2500', '3750', '5000', '6250', '7500', '8750', '10000']
+						data: [1, 2, 3, 4, 5, 6, 7, 8, 9,10, 11,12, 13, 14,15,16, 17, 18, 19, 20, 21,23,25,27,29,31,34,37, 40,43,45,47,51, 61, 71, 101,  301, 501,  801, 1000
+						]
+					}],
+					yAxis: [{
+						name: 'Tuples',
+						type: 'value',
+				        nameTextStyle: {  
+				        	fontWeight:'bold',
+				            fontSize:'16',
+				    	},
+						axisLabel: {
+							formatter: '{value}',
+							 textStyle: {
+						    	 fontWeight:'bold',
+					             fontSize:13,		        
+					   		 },
+						}
+					}],
+					series: [{
+						name: 'z=0.2',
+						textStyle: {
+					    	 fontWeight:'bold',
+				             fontSize:16,		        
+				   		 },
+						type: 'line',
+						//************设置颜色***********//
+						itemStyle: {
+							normal: {
+								color: '#1c4587',
+								lineStyle: {
+									color: '#1c4587'
+								}
+							}
+						},
+						data: [277389,150991,98072,70174,53383,42363,34673,29058,24810,21505,18873,16738,14977,
+13505,12259,11193,10273,9473,8771,8152,7603,6672,5918,5295,4774,4334,3789,3349,2988,2688,2514,2359,2092,1607,1284,761,149,69,34,39],
+						markLine: {
+							data: [{
+								type: 'average',
+								name: '平均值',								
+							}]
+						}
+					}]
+				};
+				myChart.setOption(option);
+				</script>
+                </div>
+</body>
+</html>

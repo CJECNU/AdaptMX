@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+</head>
+<script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="echarts.min.js"></script>
+<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+<body>
+    <!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
+     <div id="main" style="width: 630px;height:640px;float: right;"></div>
+    <canvas id="myCanvas" width="30" height="640"></canvas>
+	<div id="main2" style="width: 550px;height:640px;float: left;"></div>
+	 <canvas id="myCanvas2" width="1260" height="100"></canvas>
+	
+</body>
+
+<body>
+<script>
+
+	var nVolume=16587;
+	var row;
+	var col;
+	var orow;
+	var ocol;
+	var id=[];
+	var oid=[];
+	var isnew=[];
+	var count=0;
+	var myChart = echarts.init(document.getElementById('main'));
+	var myChart2 = echarts.init(document.getElementById('main2'));
+	var pl;
+	var link=[];
+	var sour=[];
+	var tar=[];
+	var R=[];
+	var S=[];
+	myChart.showLoading(); 
+	myChart2.showLoading(); 
+	
+	var mytimer=setInterval("get2()",10000);
+
+    function get2() 
+    { 
+	$.get("http://localhost:8080/demoWeb/testredits2.jsp",function(data,status){
+		   row=data['row'];
+		   col=data.col;
+		   id=data.Matrix;
+		   pl=data.pl;
+		   link=data.plan_items;
+		   var option = {
+				    title: {
+				    	 text: "New Sheme",
+				         textStyle: {
+				        	 fontWeight:'bolder',
+				        	 fontSize: 35
+				         },
+				         subtext:'{a|Total Migration Volume : }'+'  ' + (nVolume) +'  '+ '{a|tuples/states}',
+				         subtextStyle:{
+				            fontSize:22,
+				            color: 'black',
+				            rich:{
+				                a: {
+				                color: 'black',
+				                fontWeight:'bold',
+				                fontSize:25,
+				            },	         
+				            }
+				        },
+				    },
+				    tooltip: {},
+				    animationDurationUpdate: 1500,
+				    animationEasingUpdate: 'quinticInOut',
+				   
+				    series : [
+				        {
+				            type: 'graph',
+				            layout: 'none',
+				            symbolSize: 50,  //圆的大小
+				            roam: true, //鼠标缩放及平移
+						    focusNodeAdjacency: true,//是否在鼠标移到节点上的时候突出显示节点以及节点的边和邻接节点
+				            label: {
+				                normal: {
+				                    show: true,
+				                    color:'#FF34B3',
+				                    fontSize: 25,
+				                }
+				            },
+				            edgeSymbol: ['circle', 'arrow'],
+				            edgeSymbolSize: [4, 10],//箭头的大小
+				           
+				            data: [],
+				            links: [],
+				            lineStyle: {
+				                normal: {
+				                    show: true,
+				                    color: {
+				                        type: 'linear',
+				                        x: 0,
+				                        y: 0,
+				                        x2: 0,
+				                        y2: 1,
+				                        colorStops: [{
+				                            offset: 0,
+				                            color: 'red' // 0% 处的颜色
+				                        }, {
+				                            offset: 1,
+				                            color: 'blue' // 100% 处的颜色
+				                        }],
+				                        globalCoord: false // 缺省为 false
+				                    },
+
+				                    // curveness: 0.2
+
+				                },
+				                emphasis: {
+				                    color: 'red',
+				                    width: 3,
+				                    type: 'dotted', //点线
+				                }
+				            },
+				            tooltip: {
+				                position: 'bottom', //悬浮时显示的位置
+				                backgroundColor: 'green',
+				                textStyle: {
+				                    fontSize: 18,
+
+				                },
+
+				                formatter: function(params) { //悬浮提示框显示的内容	  
+				                	if(params.data.R)
+				                        return 'R：&nbsp' + params.data.R + '<br />' + 'S：&nbsp' + params.data.S + '<br />' ;
+				                }
+				            }, //悬浮时的提示框，不设置时是随鼠标移动
+				        }
+				    ]
+				};
+		   myChart.setOption(option);
+
+		    //var option2 = myChart.getOption();;
+		    //option2=option;
+		    data = option.series[0].data;
+			links = option.series[0].links;
+			myChart.hideLoading();  
+			for(var k=0;k<id.length;k++){
+				isnew[k] = (jQuery.inArray(id[k],oid) != -1) ? 0 : 1;
+			}
+			for (var i = 0; i < row; i++) {
+				for(var j = 0; j < col; j++){
+					if(id[count]!=-1){
+						data.push({
+							 name: (!id[count])? '0' : id[count],
+					         isnew: isnew[count],
+					         x: 100+10*j,
+					         y: 100+10*i,
+					         itemStyle:{
+					             normal:{
+					                 color:color= (isnew[count]==1) ? '#a2d496' : '#ffe699', //old：yellow, new:green
+					             }
+					         }
+					   		 });
+						count++;
+					}
+				}
+			}		
+			
+							
+		
+			
+			//上面是画节点，下面是画边
+			
+			for (var i = 0; i < pl; i++) {
+				 sour[i]=link[4*i];
+		         tar[i]=link[4*i+1];
+		         R[i]=link[4*i+2].toFixed(2);
+		         S[i]=link[4*i+3].toFixed(2);
+			}		
+			for (var i = 0; i < pl; i++) {
+				 links.push({
+		                source: jQuery.inArray(sour[i],id),  //source这是直接name不行 他是按ID来的 所以要从name中找出索引
+		                target: jQuery.inArray(tar[i],id),
+		                R: R[i],
+		                S: S[i]
+		            });
+			}		
+			
+			myChart.clear();
+			myChart.setOption(option);
+			//option=null;
+			sour=[];
+		    tar=[];
+		    R=[];
+		    S=[];
+			oid=id;
+			orow=row;
+			ocol=col;
+			id=[];
+			link=[];
+			count=0;
+		  });
+		//画旧图
+	 var option2 = {
+			    title: {
+			    	 text: "AdaptMX: Old Sheme",
+			         textStyle: {
+			        	 fontWeight:'bolder',
+			        	 fontSize: 35
+			         },
+			    },
+			    tooltip: {},
+			    animationDurationUpdate: 1500,
+			    animationEasingUpdate: 'quinticInOut',
+			   
+			    series : [
+			        {
+			            type: 'graph',
+			            layout: 'none',
+			            symbolSize: 50,  //圆的大小
+			            roam: true, //鼠标缩放及平移
+					    focusNodeAdjacency: true,//是否在鼠标移到节点上的时候突出显示节点以及节点的边和邻接节点
+			            label: {
+			                normal: {
+			                    show: true,
+			                    color:'#FF34B3',
+			                    fontSize: 25,
+			                }
+			            },
+			            edgeSymbol: ['circle', 'arrow'],
+			            edgeSymbolSize: [4, 10],//箭头的大小
+			           
+			            data: [],
+			            links: [],
+			            lineStyle: {
+			                normal: {
+			                    show: true,
+			                    color: {
+			                        type: 'linear',
+			                        x: 0,
+			                        y: 0,
+			                        x2: 0,
+			                        y2: 1,
+			                        colorStops: [{
+			                            offset: 0,
+			                            color: 'red' // 0% 处的颜色
+			                        }, {
+			                            offset: 1,
+			                            color: 'blue' // 100% 处的颜色
+			                        }],
+			                        globalCoord: false // 缺省为 false
+			                    },
+
+			                    // curveness: 0.2
+
+			                },
+			                emphasis: {
+			                    color: 'red',
+			                    width: 3,
+			                    type: 'dotted', //点线
+			                }
+			            },
+			            tooltip: {
+			                position: 'bottom', //悬浮时显示的位置
+			                backgroundColor: 'green',
+			                textStyle: {
+			                    fontSize: 18,
+
+			                },
+
+			                formatter: function(params) { //悬浮提示框显示的内容	  
+			                	if(params.data.R)
+			                        return 'R：&nbsp' + params.data.R + '<br />' + 'S：&nbsp' + params.data.S + '<br />' ;
+			                }
+			            }, //悬浮时的提示框，不设置时是随鼠标移动
+			        }
+			    ]
+			};
+	   myChart2.setOption(option2);
+
+	    //var option2 = myChart.getOption();;
+	    //option2=option;
+	    data = option2.series[0].data;
+		links = option2.series[0].links;
+		myChart2.hideLoading();  
+		for (var i = 0; i < orow; i++) {
+			for(var j = 0; j < ocol; j++){
+				if(oid[count]!=-1){
+					data.push({
+						 name: (!oid[count])? '0' : oid[count],
+				         x: 100+10*j,
+				         y: 100+10*i,
+				         itemStyle:{
+				             normal:{
+				                 color:'#ffe699', //old：yellow, new:green
+				             }
+				         }
+				   		 });
+					count++;
+				}
+			}
+		}
+		myChart2.clear();
+		myChart2.setOption(option2);
+		count=0;
+    } 
+	
+	 
+</script>
+<script>
+
+var c=document.getElementById("myCanvas");
+var ctx=c.getContext("2d");
+ctx.fillStyle="#BEBEBE";
+ctx.fillRect(10,0,5,640);
+
+</script>
+
+<script>
+//画tag
+var c=document.getElementById("myCanvas2");
+var ctx=c.getContext("2d");
+ctx.font = "30px Arial";
+//设置字体填充颜色
+ctx.fillStyle = "black";
+//从坐标点(50,50)开始绘制文字
+ctx.fillText("New Unit", 350, 60);
+ctx.fillText("Old Unit", 650, 60);
+ctx.fillText("Data Stream", 950, 60);
+
+var circle1 = {
+    x : 300,    //圆心的x轴坐标值
+    y : 50,    //圆心的y轴坐标值
+};
+var circle2 = {
+	    x : 600,    //圆心的x轴坐标值
+	    y : 50,    //圆心的y轴坐标值
+	};
+	
+ctx.beginPath();
+ctx.fillStyle = "#a2d496";
+ctx.arc(circle1.x, circle1.y, 30, 0, Math.PI * 2, true);    
+ctx.fill();
+ctx.save();
+
+ctx.beginPath();
+ctx.fillStyle = "#ffe699";
+ctx.arc(circle2.x, circle2.y, 30, 0, Math.PI * 2, true);    
+ctx.fill();
+ctx.save();
+
+
+function drawArrow(ctx, fromX, fromY, toX, toY, theta, headlen, width, color) {
+	var ly =( toY - fromY);
+ 	var lx =( toX - fromX);
+ if(ly>0&& lx>0){ fromX+=8; fromY+=8;  toX-=21;  toY-=21;
+ }if(ly>0&& lx<0){  fromX-=21; fromY+=21; toX+=21; toY-=21;
+ }if(ly<0&& lx>0){  fromX+=21;  fromY-=21; toX-=21;  toY+=21;
+ }if(ly<0&& lx<0){ fromX-=21;  fromY-=21; toX+=21; toY+=21;
+ }if(ly==0 && lx!=0){
+	if(fromX>toX) { fromX-=30; toX+=30; }
+	if(fromX<toX) { fromX+=30; toX-=30; }
+ }if(ly!=0 && lx==0){
+	if(fromY>toY) { fromY-=30; toY+=30; }
+	if(fromY<toY) { fromY+=30; toY-=30; }
+ }
+	theta = typeof (theta) != 'undefined' ? theta : 30;
+	headlen = typeof (theta) != 'undefined' ? headlen : 10;
+	width = typeof (width) != 'undefined' ? width : 1;
+	color = typeof (color) != 'color' ? color : '#000'; // 计算各角度和对应的P2,P3坐标 
+	var angle = Math.atan2(fromY - toY, fromX - toX) * 180 / Math.PI,
+		angle1 = (angle + theta) * Math.PI / 180,
+		angle2 = (angle - theta) * Math.PI / 180,
+		topX = headlen * Math.cos(angle1),
+		topY = headlen * Math.sin(angle1),
+		botX = headlen * Math.cos(angle2),
+		botY = headlen * Math.sin(angle2);
+		ctx.save();
+		ctx.beginPath();
+		var arrowX = fromX - topX,
+			arrowY = fromY - topY;
+		ctx.moveTo(arrowX, arrowY);
+		ctx.moveTo(fromX, fromY);
+		ctx.lineTo(toX, toY); 
+		arrowX = toX + topX;
+		arrowY = toY + topY;
+		ctx.moveTo(arrowX, arrowY);
+		ctx.lineTo(toX, toY);
+		arrowX = toX + botX;
+		arrowY = toY + botY;
+		ctx.lineTo(arrowX, arrowY);
+		ctx.strokeStyle = color;
+		ctx.lineWidth = width;
+		ctx.stroke();
+		ctx.restore();
+	}
+
+var linearGradient1 = ctx.createLinearGradient(800, 50, 960, 50);
+linearGradient1.addColorStop(0, '#FF0000');  //红色起点
+linearGradient1.addColorStop(1, '#A020F0'); //紫色终点
+drawArrow(ctx, 800, 50, 960, 50, 30, 20, 7, linearGradient1);
+ctx.save();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>ECharts</title>
+</head>
+
+<script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="echarts.min.js"></script>
+<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div id="main" style="height:320px"></div>
+    <!-- ECharts单文件引入 -->
+<body>
+
+<script>
+
+		var myChart = echarts.init(document.getElementById('main'));
+		var x=[];
+		var y=[];
+		var sy=[];
+		var tx=[];
+		var finalx=[];
+		var len;
+		myChart.showLoading(); 
+		
+		
+		setInterval("get()", 5000); 
+
+        function get() 
+        { 
+        $.get("http://localhost:8080/demoWeb/testredits3.jsp",function(data,status){
+        		len=data.len;
+        	   	x=data.x;
+        	   	for(var i=0;i<len;i++){
+        	   		tx.push(x[i]);
+        	   	}
+    
+        	   	y=data.y;  
+        	   	x.sort(function(a,b){return a-b});
+        	   	for(var i=0;i<len;i++){
+        	   		finalx.push('task'+x[i]);
+        	   		sy.push(y[jQuery.inArray(x[i],tx)]);
+        	   	}
+
+                var option = {
+                	    title: {
+                	    	text: 'AdaptMX',
+        					x: 'center',
+        					y: 'bottom'
+                	    },
+                	    textStyle: {
+   					  	 color:'black',
+   				    	 fontWeight:'bold',
+   			             fontSize:16,		        
+   			   		 },
+                	    tooltip: {
+                	    	trigger: 'axis'
+                	    },
+                	    toolbox: {
+        					show: true,
+        					feature: {
+        						mark: {
+        							show: true
+        						},
+        						dataView: {
+        							show: true,
+        							readOnly: false
+        						},
+        						restore: {
+        							show: true
+        						}
+        					}
+        				},
+                	    xAxis: {
+                	    	axisLabel: {        
+        			            show: true,
+        			            textStyle: {
+        			            	fontWeight:'bold',
+        			                fontSize:'16'
+        			            }
+        			        },
+                	        data: finalx,
+                	    },
+                	    yAxis: {
+                	    	axisLabel: {        
+        			            show: true,
+        			            textStyle: {
+        			            	fontWeight:'bold',
+        			                fontSize:'16'
+        			            }
+        			        },
+        			    	type: 'value',       				
+                	    },
+                	    series: [{
+                	        name: 'load',
+                	        type: 'bar',
+                	        barWidth : 28,
+                	        data: sy,
+                	        markPoint: {
+        						data: [{
+        							type: 'max',
+        							name: '最大值'
+        						}, {
+        							type: 'min',
+        							name: '最小值'
+        						}]
+        					},
+                	    }]
+                };
+        		
+                // 为echarts对象加载数据 
+                myChart.hideLoading();
+                myChart.setOption(option);
+     	  		sy=[];
+     	  		tx=[];
+     	  		finalx=[];
+		});
+
+} 
+        
+        
+      
+    </script>
+</body>
+</html>

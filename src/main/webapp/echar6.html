@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="echarts.min.js"></script>
+<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+<body>
+    <!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
+    <div id="main" style="width: 630px;height:640px;float: left;"></div>
+    <canvas id="myCanvas" width="30" height="640"></canvas>
+	<div id="main2" style="width: 550px;height:640px;float: right;"></div>
+	 <canvas id="myCanvas2" width="1260" height="100"></canvas>
+</body>
+<body>
+<script>
+	var flag=0;//0代表行，1代表列
+	var flag2=0;//第几行或者列
+	var row=2;
+	var col=3;
+	var trow=3;
+	var tcol=1;
+	var id=[0,1,2,3,4,5];
+	var taskid=[0,1,2];
+	var count=0;
+	var tupleid='tuple1';
+	var tar=0;
+	var tar2=1;
+	var myChart = echarts.init(document.getElementById('main'));
+	var option = {
+		    title: {
+		        text: 'Among Units',
+		        textStyle: {
+			    	 fontWeight:'bold',
+		             fontSize:25,		        
+		   		 },
+		    },
+		    tooltip: {},
+		    animationDurationUpdate: 1500,
+		    animationEasingUpdate: 'quinticInOut',
+		    series : [
+		        {
+		            type: 'graph',
+		            layout: 'none',
+		            symbolSize: 50,  //圆的大小
+		            roam: true, //鼠标缩放及平移
+					xAxisIndex: 0,
+					yAxisIndex: 0,
+				    focusNodeAdjacency: true,//是否在鼠标移到节点上的时候突出显示节点以及节点的边和邻接节点
+		            label: {
+		                normal: {
+		                    show: true,
+		                    color:'#FF34B3',
+		                    fontSize: 25,
+		                }
+		            },
+		            edgeSymbol: ['circle', 'arrow'],
+		            edgeSymbolSize: [4, 10],//箭头的大小
+		            edgeLabel: {
+		                normal: {
+		                    show: false
+		                },
+		                emphasis: {
+		                    textStyle: {
+		                        fontSize: 20 //边节点显示的字体大小
+		                    }
+		                }
+		            },
+		            data: [],
+		            links: [],
+		            lineStyle: {
+		                normal: {
+		                    show: true,
+		                    color: {
+		                        type: 'linear',
+		                        x: 0,
+		                        y: 0,
+		                        x2: 0,
+		                        y2: 1,
+		                        colorStops: [{
+		                            offset: 0,
+		                            color: 'red' // 0% 处的颜色
+		                        }, {
+		                            offset: 1,
+		                            color: 'blue' // 100% 处的颜色
+		                        }],
+		                        globalCoord: false // 缺省为 false
+		                    },
+
+		                    // curveness: 0.2
+
+		                },
+		                emphasis: {
+		                    color: 'red',
+		                    width: 3,
+		                    type: 'dashed', //虚线
+
+		                }
+		            },
+		           
+		        }
+		    ]
+		};
+	
+	data = option.series[0].data;
+	links = option.series[0].links;
+	function judge(a){
+		if(flag==0 && Math.floor(a/col)==flag2){
+			return true;
+		}
+		if(flag==1 && a%col==flag2){
+			return true;
+		}
+		return false;
+	}
+	for (var i = 0; i < row; i++) {
+		for(var j = 0; j < col; j++){
+			if(id[count]!=-1){
+				data.push({
+					 name: (!id[count])? '0' : id[count],
+			         x: 10+10*j,
+			         y: 50+10*i,
+			         done:(judge(count)) ? 1:0,
+			         itemStyle:{
+			             normal:{
+			                 color:(judge(count)) ? '#00BFFF':'#a2d496', //node:green 没被选中绿色，选中蓝色
+			             }
+			         }
+			   		 });
+				count++;
+			}
+		}
+	}
+	data.push({
+		 name: tupleid,
+         x: 0,
+         y: 50,
+         symbol: 'diamond',
+         symbolSize: 60,
+         itemStyle:{
+             normal:{
+                 color:'#ffe699', //tuple:yellow
+             }
+         }
+   		 });
+	links.push({
+        source: tupleid,  //source这是直接name不行 他是按ID来的 所以要从name中找出索引
+        target: jQuery.inArray(tar,id),
+    });
+	
+	count=0;
+	myChart.setOption(option);
+
+	
+	
+	var myChart2 = echarts.init(document.getElementById('main2'));
+	
+	myChart.on("click", function(a) {
+		var option2 = {
+			    title: {
+				        text: 'Inside A Unit',
+				        textStyle: {
+					    	 fontWeight:'bold',
+				             fontSize:25,		        
+				   		 },
+			    },
+			  
+			    tooltip: {},
+			    animationDurationUpdate: 1500,
+			    animationEasingUpdate: 'quinticInOut',
+			    series : [
+			        {
+			            type: 'graph',
+			            layout: 'none',
+			            symbolSize: 50,  //圆的大小
+			            roam: true, //鼠标缩放及平移
+			            symbol: 'rect',
+					    focusNodeAdjacency: true,//是否在鼠标移到节点上的时候突出显示节点以及节点的边和邻接节点
+			            label: {
+			                normal: {
+			                    show: true,
+			                    color:'#FF34B3',
+			                    fontSize: 25,
+			                }
+			            },
+			            edgeSymbol: ['circle', 'arrow'],
+			            edgeSymbolSize: [4, 15],//箭头的大小
+			            edgeLabel: {
+			                normal: {
+			                    show: false
+			                },
+			                emphasis: {
+			                    textStyle: {
+			                        fontSize: 20 //边节点显示的字体大小
+			                    }
+			                }
+			            },
+			            data: [],
+			            links: [],
+			            lineStyle: {
+			                normal: {
+			                    show: true,
+			                    color: {
+			                        type: 'linear',
+			                        x: 0,
+			                        y: 0,
+			                        x2: 0,
+			                        y2: 1,
+			                        colorStops: [{
+			                            offset: 0,
+			                            color: 'red' // 0% 处的颜色
+			                        }, {
+			                            offset: 1,
+			                            color: 'blue' // 100% 处的颜色
+			                        }],
+			                        globalCoord: false // 缺省为 false
+			                    },
+
+			                    // curveness: 0.2
+
+			                },
+			                emphasis: {
+			                    color: 'red',
+			                    width: 3,
+			                    type: 'dashed', //虚线
+
+			                }
+			            },
+
+			        }
+			    ]
+			};
+	    data = option2.series[0].data;
+		links = option2.series[0].links;
+	if(a.data.done==1){
+		for (var i = 0; i < trow; i++) {
+			for(var j = 0; j < tcol; j++){
+				if(taskid[count]!=-1){
+					data.push({
+						 name: (!taskid[count])? '0' : id[count],
+				         x: 10+10*j,
+				         y: 50+10*i,
+				         itemStyle:{
+				             normal:{
+				                 color:'#a2d496', //node:green
+				             }
+				         }
+				   		 });
+					count++;
+				}
+			}
+		}
+		data.push({
+			 name: tupleid,
+	         x: 0,
+	         y: 50,
+	         symbol: 'diamond',
+	         symbolSize: 60,
+	         itemStyle:{
+	             normal:{
+	                 color:'#ffe699', //tuple:yellow
+	             }
+	         }
+	   		 });
+		links.push({
+            source: tupleid,  //source这是直接name不行 他是按ID来的 所以要从name中找出索引
+            target: jQuery.inArray(tar2,taskid),
+        });
+		myChart2.setOption(option2);
+		count=0;
+	}
+	else{
+		myChart2.clear();
+		//myChart2.setOption();
+		}
+	});
+</script>
+<script>
+
+var c=document.getElementById("myCanvas");
+var ctx=c.getContext("2d");
+ctx.fillStyle="#BEBEBE";
+ctx.fillRect(10,0,5,640);
+
+</script>
+
+<script>
+//画tag
+var c=document.getElementById("myCanvas2");
+var ctx=c.getContext("2d");
+ctx.font = "30px Arial";
+//设置字体填充颜色
+ctx.fillStyle = "black";
+//从坐标点(50,50)开始绘制文字
+ctx.fillText("Unit", 350, 60);
+ctx.fillText("Unit(Chosen)", 600, 60);
+ctx.fillText("Task", 950, 60);
+
+var circle1 = {
+    x : 300,    //圆心的x轴坐标值
+    y : 50,    //圆心的y轴坐标值
+};
+var circle2 = {
+	    x : 550,    //圆心的x轴坐标值
+	    y : 50,    //圆心的y轴坐标值
+	};
+
+ctx.beginPath();
+ctx.fillStyle = "#a2d496";
+ctx.arc(circle1.x, circle1.y, 30, 0, Math.PI * 2, true);    
+ctx.fill();
+ctx.save();
+
+ctx.beginPath();
+ctx.fillStyle = "#00BFFF";
+ctx.arc(circle2.x, circle2.y, 30, 0, Math.PI * 2, true);    
+ctx.fill();
+ctx.save();
+
+ctx.beginPath();
+ctx.fillStyle = "#a2d496";
+ctx.rect(880,20,50,50);
+ctx.fill();
+ctx.save();
+
+
+</script>
+</body>
+</html>

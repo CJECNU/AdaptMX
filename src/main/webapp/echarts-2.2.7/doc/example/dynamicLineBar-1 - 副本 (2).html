@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<style type="text/css">
+*{
+	margin:0;
+	padding:0;
+}
+
+</style>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>bar-1</title>
+
+    <link rel="shortcut icon" href="../asset/ico/favicon.png">
+
+    <link href="../asset/css/bootstrap.css" rel="stylesheet">
+    <link href="../asset/css/echartsHome-1.css" rel="stylesheet">
+   
+    <script src="./www/js/echarts.js"></script>
+    <script src="../asset/js/codemirror.js"></script>
+
+</head>
+
+<body>
+            <div id="sidebar-code" class="col-md-4" hidden>
+                <div class="well sidebar-nav">
+                    <textarea id="code" name="code">
+option = {
+  title: {
+						text: 'Stream Volume变化图',
+						subtext: 'f = |R|/|S|',
+						x: 'center'
+					},
+					tooltip: {
+						trigger: 'axis'
+					},
+					calculable: true,
+					xAxis: [{
+						name: '运行时间',
+						type: 'category',
+						boundaryGap: false,
+						data : (function (){
+              		 	 var now = new Date();
+               			 var res = [];
+                		 var len = 20;
+               			 while (len--) {
+               			     res.unshift(now.toLocaleTimeString().replace(/^\D*/,''));
+               			     now = new Date(now - 3000);
+              			  }
+               			 return res;
+           				 })()
+					}],
+					yAxis: [{
+						name: 'f',
+						type: 'value',
+						axisLabel: {
+							formatter: '{value}'
+						}
+					}],
+					series: [{
+						name: 'f: ',
+						type: 'line',
+						itemStyle: {
+							normal: {
+								color: '#1c4587',
+								lineStyle: {
+									color: '#1c4587'
+								}
+							}
+						},
+						data: [2.333, 2.333, 2.333, 0.25, 0.25, 1.5, 1.5, 0.1111, 0.1111, 0.1111, 4, 4, 4, 0.6667, 0.6667, 0.6667, 0.6667, 6.692308, 6.692308, 6.692308]
+					}]
+};
+var lastData;
+var arrayData = [2.333, 2.333, 2.333, 0.25, 0.25, 1.5, 1.5, 0.1111, 0.1111, 0.1111, 4, 4, 4, 0.6667, 0.6667, 0.6667, 0.6667, 6.692308, 6.692308, 6.692308];
+var cur = 0;
+var axisData;
+clearInterval(timeTicket);
+timeTicket = setInterval(function (){
+	if(cur == 20){cur=0;}
+    lastData  = arrayData[cur];
+	cur++;
+    axisData = (new Date()).toLocaleTimeString().replace(/^\D*/,'');
+    
+    // 动态数据接口 addData
+    myChart.addData([
+        [
+            0,        // 系列索引
+            lastData, // 新增数据
+            false,    // 新增数据是否从队列头部插入
+            false,    // 是否增加队列长度，false则自定删除原有数据，队头插入删队尾，队尾插入删队头
+            axisData  // 坐标轴标签
+        ]
+    ]);
+}, 3000);
+                    </textarea>
+              </div>
+            </div>
+            <div id="graphic">
+                <div id="main" class="main"></div>
+                <div hidden>
+                    <select id="theme-select"></select>
+                </div>
+            </div>
+
+  
+    <script src="../asset/js/jquery.min.js"></script>
+    <script type="text/javascript" src="../asset/js/echartsHome.js"></script>
+    <script src="../asset/js/bootstrap.min.js"></script>
+    <script type="text/javascript">var timeTicket;</script>
+    <script src="../asset/js/echartsExample.js"></script>
+</body>
+</html>
