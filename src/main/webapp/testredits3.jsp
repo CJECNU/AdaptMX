@@ -13,6 +13,7 @@
 	String host="127.0.0.1";
 	int port=6379;
 	long len;
+	int done=0;
 	Jedis client=new Jedis(host,port);
 	ArrayList<String> arrayList = new ArrayList<String>();
 	ArrayList<String> arrayList2 = new ArrayList<String>();
@@ -26,6 +27,7 @@
 	}
 	if(!client.exists("load"+(++num))){
 		num=1;
+		done=1;
 		}
 %>
-{ "len":<%=len%>,"x":<%=arrayList%>,"y":<%=arrayList2%>}
+{ "len":<%=len%>,"x":<%=arrayList%>,"y":<%=arrayList2%>,"done":<%=done%>}

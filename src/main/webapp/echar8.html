@@ -21,14 +21,17 @@
 		var tx=[];
 		var finalx=[];
 		var len;
+		var done;
 		myChart.showLoading(); 
 		
 		
-		setInterval("get()", 5000); 
+		var mytimer=setInterval("get()", 5000); 
 
         function get() 
         { 
         $.get("http://localhost:8080/demoWeb/testredits3.jsp",function(data,status){
+        		done=data.done;
+        		if(done==1) {clearInterval(mytimer);}
         		len=data.len;
         	   	x=data.x;
         	   	for(var i=0;i<len;i++){

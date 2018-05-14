@@ -10,65 +10,71 @@
 <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
 <body>
     <!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
+    <canvas id="myCanvas3" width="1260" height="100"></canvas>
      <div id="main" style="width: 630px;height:640px;float: right;"></div>
     <canvas id="myCanvas" width="30" height="640"></canvas>
 	<div id="main2" style="width: 550px;height:640px;float: left;"></div>
 	 <canvas id="myCanvas2" width="1260" height="100"></canvas>
-	
+	<div id="main3" style="width: 1260px;height:100px;"></div>
 </body>
 
 <body>
 <script>
 
-	var nVolume=16587;
+	var nVolume=0;
 	var row;
 	var col;
-	var orow;
-	var ocol;
+	var orow=1;
+	var ocol=1;
 	var id=[];
-	var oid=[];
+	var oid=[0];
 	var isnew=[];
 	var count=0;
 	var myChart = echarts.init(document.getElementById('main'));
 	var myChart2 = echarts.init(document.getElementById('main2'));
+	var myChart3 = echarts.init(document.getElementById('main3'));
 	var pl;
 	var link=[];
 	var sour=[];
 	var tar=[];
 	var R=[];
 	var S=[];
+	var done;
+	var first=0;
 	myChart.showLoading(); 
 	myChart2.showLoading(); 
 	
 	var mytimer=setInterval("get2()",10000);
-
+	var option3 = {
+		    title: {
+		    	 text: 'Total Migration Volume : '+'  ' + "0" +'  '+ 'tuples/states',
+		         textStyle: {
+		        	 fontWeight:'bolder',
+		        	 fontSize: 25
+		         },
+		         left:'center',
+		    },
+		    tooltip: {},
+		    animationDurationUpdate: 1500,
+		    animationEasingUpdate: 'quinticInOut'
+	}
+	myChart3.setOption(option3);
     function get2() 
     { 
-	$.get("http://localhost:8080/demoWeb/testredits2.jsp",function(data,status){
+	$.get("http://localhost:8080/demoWeb/testredits2.jsp",function(data,status){		 
+		   if(first<2) first++;
+		   done=data.done;
+		   if(done==1) {clearInterval(mytimer);}
 		   row=data['row'];
 		   col=data.col;
 		   id=data.Matrix;
 		   pl=data.pl;
 		   link=data.plan_items;
+		   nVolume=data.total;
+		   
 		   var option = {
 				    title: {
-				    	 text: "New Sheme",
-				         textStyle: {
-				        	 fontWeight:'bolder',
-				        	 fontSize: 35
-				         },
-				         subtext:'{a|Total Migration Volume : }'+'  ' + (nVolume) +'  '+ '{a|tuples/states}',
-				         subtextStyle:{
-				            fontSize:22,
-				            color: 'black',
-				            rich:{
-				                a: {
-				                color: 'black',
-				                fontWeight:'bold',
-				                fontSize:25,
-				            },	         
-				            }
-				        },
+				    	
 				    },
 				    tooltip: {},
 				    animationDurationUpdate: 1500,
@@ -137,13 +143,13 @@
 				        }
 				    ]
 				};
-		   myChart.setOption(option);
+		    myChart.setOption(option);
 
 		    //var option2 = myChart.getOption();;
 		    //option2=option;
 		    data = option.series[0].data;
 			links = option.series[0].links;
-			myChart.hideLoading();  
+			if(first==2) myChart.hideLoading();  
 			for(var k=0;k<id.length;k++){
 				isnew[k] = (jQuery.inArray(id[k],oid) != -1) ? 0 : 1;
 			}
@@ -186,8 +192,8 @@
 		            });
 			}		
 			
-			myChart.clear();
-			myChart.setOption(option);
+			if(first==2) myChart.clear();
+			if(first==2) myChart.setOption(option);
 			//option=null;
 			sour=[];
 		    tar=[];
@@ -199,15 +205,28 @@
 			id=[];
 			link=[];
 			count=0;
+			
+			
+			var option3 = {
+				    title: {
+				    	 text: 'Total Migration Volume : '+'  ' + (nVolume) +'  '+ 'tuples/states',
+				         textStyle: {
+				        	 fontWeight:'bolder',
+				        	 fontSize: 25
+				         },
+				         left:'center',
+				    },
+				    tooltip: {},
+				    animationDurationUpdate: 1500,
+				    animationEasingUpdate: 'quinticInOut'
+			}
+			myChart3.clear();
+			myChart3.setOption(option3);
+			
 		  });
 		//画旧图
 	 var option2 = {
 			    title: {
-			    	 text: "AdaptMX: Old Sheme",
-			         textStyle: {
-			        	 fontWeight:'bolder',
-			        	 fontSize: 35
-			         },
 			    },
 			    tooltip: {},
 			    animationDurationUpdate: 1500,
@@ -303,6 +322,7 @@
 		myChart2.clear();
 		myChart2.setOption(option2);
 		count=0;
+
     } 
 	
 	 
@@ -315,7 +335,20 @@ ctx.fillStyle="#BEBEBE";
 ctx.fillRect(10,0,5,640);
 
 </script>
+<script>
+//画标题
+var c=document.getElementById("myCanvas3");
+var ctx=c.getContext("2d");
+ctx.font = "bolder 35px Arial";
+//设置字体填充颜色
+ctx.fillStyle = "black";
+//从坐标点(50,50)开始绘制文字
 
+ctx.fillText("AdaptMX: Old Sheme", 10, 60);
+ctx.fillText("New Sheme", 650, 60);
+
+
+</script>
 <script>
 //画tag
 var c=document.getElementById("myCanvas2");
@@ -324,6 +357,7 @@ ctx.font = "30px Arial";
 //设置字体填充颜色
 ctx.fillStyle = "black";
 //从坐标点(50,50)开始绘制文字
+
 ctx.fillText("New Unit", 350, 60);
 ctx.fillText("Old Unit", 650, 60);
 ctx.fillText("Data Stream", 950, 60);
